@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Status</title>
+</head>
+<body>
+    {% if status == 'completed' %}
+        <p>Report Status: Complete</p>
+        <p><a href="{{ csv_url }}" download>Download CSV</a></p>
+    {% else %}
+        <p>Report Status: Running</p>
+    {% endif %}
+</body>
+</html>
