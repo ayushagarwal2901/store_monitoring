@@ -1,4 +1,3 @@
-# app.py
 import pandas as pd
 from model import db_connection, db_cursor, create_tables, drop_tables
 import os
@@ -205,8 +204,13 @@ def generate_report(report_id):
     os.remove('updated_business_hours.csv')
     os.remove('updated_store_timezone.csv')
 
+
     # Read data from store_status table in mysql database
     df_store_status = pd.read_sql_query("SELECT store_id, status, timestamp_utc FROM store_status", db_connection)
+
+
+    # Sort the data based on store_id and timestamp_utc
+    df_store_status = df_store_status.sort_values(by=['store_id', 'timestamp_utc'])
 
     # Call function to store valid data i.e. removing data not in business hours
     valid_store_data(df_store_status, df_updated_business_hours)
@@ -270,6 +274,9 @@ def valid_store_data(df_store_status, df_updated_business_hours):
     # Initialize an empty dataframe
     valid_data_df = pd.DataFrame()
 
+    # Initialize a list to store filtered data
+    filtered_data_list = []
+
     # Loop through each store_id and day using nested groupby
     for (store_id, day), group in df_store_status.groupby([df_store_status['store_id'], df_store_status['timestamp_utc'].dt.dayofweek]):
 
@@ -306,9 +313,14 @@ def valid_store_data(df_store_status, df_updated_business_hours):
         filtered_group['day'] = day
         # filtered_group['interval'] = interval
 
-        # Append filtered_data to the valid_data DataFrame
-        valid_data_df = pd.concat([valid_data_df, filtered_group], ignore_index=True)
- 
+        # Append filtered_group to the list
+        filtered_data_list.append(filtered_group)
+
+    # Concatenate all filtered dataframes into a single DataFrame
+    valid_data_df = pd.concat(filtered_data_list, ignore_index=True)
+
+
+
     # Sort the final DataFrame by store_id and timestamp_utc
     valid_data_df = valid_data_df.sort_values(by=['store_id', 'timestamp_utc'])
   
@@ -317,7 +329,7 @@ def valid_store_data(df_store_status, df_updated_business_hours):
     
     # Convert timestamp_utc to datetime
     valid_data_df["timestamp_utc"] = pd.to_datetime(valid_data_df["timestamp_utc"])
-
+  
     uptime_downtime_last_hour(valid_data_df, current_timestamp, unique_store_ids, report_data)
     uptime_downtime_last_day(valid_data_df, current_timestamp, unique_store_ids, report_data)
     uptime_downtime_last_week(valid_data_df, current_timestamp, unique_store_ids, report_data)
