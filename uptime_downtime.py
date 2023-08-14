@@ -7,6 +7,9 @@ def uptime_downtime_last_hour(valid_data_df, current_timestamp, unique_store_ids
     # Initialize an empty DataFrame to store filtered data
     combined_filtered_data = pd.DataFrame()
 
+    # Initialize a list to store filtered data
+    filtered_data_list = []
+
     for store_id in unique_store_ids:
 
         # Filter valid_data_df for the current store_id
@@ -26,8 +29,12 @@ def uptime_downtime_last_hour(valid_data_df, current_timestamp, unique_store_ids
             prev_row = store_data[store_data["timestamp_utc"] < one_hour_ago].tail(1)
             filtered_data = pd.concat([prev_row, filtered_data], ignore_index=True)
 
-        # Append filtered_data to the combined_filtered_data DataFrame
-        combined_filtered_data = pd.concat([combined_filtered_data, filtered_data], ignore_index=True)
+        # Append filtered_group to the list
+        filtered_data_list.append(filtered_data)
+    
+    # Concatenate all filtered dataframes into a single DataFrame
+    combined_filtered_data = pd.concat(filtered_data_list, ignore_index=True)
+    
 
     # Loop through unique store_ids
     unique_store_ids = valid_data_df['store_id'].unique()
@@ -87,6 +94,9 @@ def uptime_downtime_last_day(valid_data_df, current_timestamp, unique_store_ids,
     # Initialize an empty DataFrame to store filtered data
     combined_filtered_data = pd.DataFrame()
 
+    # Initialize a list to store filtered data
+    filtered_data_list = []
+
     for store_id in unique_store_ids:
 
         # Filter valid_data_df for the current store_id
@@ -107,8 +117,11 @@ def uptime_downtime_last_day(valid_data_df, current_timestamp, unique_store_ids,
             prev_row = store_data[store_data["timestamp_utc"] < one_day_ago].tail(1)
             filtered_data = pd.concat([prev_row, filtered_data], ignore_index=True)
 
-        # Append filtered_data to the combined_filtered_data DataFrame
-        combined_filtered_data = pd.concat([combined_filtered_data, filtered_data], ignore_index=True)
+        # Append filtered_group to the list
+        filtered_data_list.append(filtered_data)
+    
+    # Concatenate all filtered dataframes into a single DataFrame
+    combined_filtered_data = pd.concat(filtered_data_list, ignore_index=True)
 
     # Loop through unique store_ids
     unique_store_ids = valid_data_df['store_id'].unique()
@@ -167,6 +180,9 @@ def uptime_downtime_last_week(valid_data_df, current_timestamp, unique_store_ids
     # Initialize an empty DataFrame to store filtered data
     combined_filtered_data = pd.DataFrame()
 
+    # Initialize a list to store filtered data
+    filtered_data_list = []
+
     for store_id in unique_store_ids:
 
         # Filter valid_data_df for the current store_id
@@ -187,9 +203,11 @@ def uptime_downtime_last_week(valid_data_df, current_timestamp, unique_store_ids
             if not prev_row.empty:
                 filtered_data = pd.concat([prev_row, filtered_data], ignore_index=True)
 
-
-        # Append filtered_data to the combined_filtered_data DataFrame
-        combined_filtered_data = pd.concat([combined_filtered_data, filtered_data], ignore_index=True)
+        # Append filtered_group to the list
+        filtered_data_list.append(filtered_data)
+    
+    # Concatenate all filtered dataframes into a single DataFrame
+    combined_filtered_data = pd.concat(filtered_data_list, ignore_index=True)
 
     # Loop through unique store_ids
     unique_store_ids = valid_data_df['store_id'].unique()
